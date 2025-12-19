@@ -1,0 +1,70 @@
+﻿@page "/"
+@using Restfull.Client.Services
+@inject ResourceService ResourceService
+
+<PageTitle>Resource Manager - Главная</PageTitle>
+
+<div class="text-center">
+    <h1 class="display-4">Resource Manager</h1>
+    <p>Система управления ресурсами предприятия</p>
+
+    <div class="mt-5">
+        <a class="btn btn-primary btn-lg" href="resources">
+            <i class="fas fa-list"></i> Управление ресурсами
+        </a>
+    </div>
+
+    <div class="mt-5">
+        <h4>Статус системы:</h4>
+        @if (isLoading)
+        {
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert @(isConnected ? "alert-success" : "alert-warning")">
+                @(isConnected ? "✓ Подключено к API" : "✗ Нет подключения к API")
+            </div>
+        }
+    </div>
+
+    <div class="mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h5>Быстрый старт</h5>
+            </div>
+            <div class="card-body">
+                <ol class="text-start">
+                    <li>Нажмите "Управление ресурсами"</li>
+                    <li>Нажмите "Заполнить тестовыми данными"</li>
+                    <li>Просмотрите, создайте, измените или удалите ресурсы</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isLoading = true;
+    private bool isConnected = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Простая проверка подключения
+            await ResourceService.GetResourcesAsync();
+            isConnected = true;
+        }
+        catch
+        {
+            isConnected = false;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -1,0 +1,78 @@
+﻿@page "/resources"
+@using Restfull.Client.Services
+@inject ResourceService ResourceService
+@inject NavigationManager Navigation
+
+<PageTitle>Ресурсы</PageTitle>
+
+<h3>Управление ресурсами</h3>
+
+<div class="mb-3">
+    <button class="btn btn-primary" @onclick="SeedDatabase">Заполнить тестовыми данными</button>
+    <button class="btn btn-success" @onclick="AddResource">Добавить ресурс</button>
+</div>
+
+@if (isLoading)
+{
+    <p>Загрузка данных...</p>
+}
+else if (!resources.Any())
+{
+    <div class="alert alert-info">
+        Нет ресурсов. Нажмите "Заполнить тестовыми данными" чтобы начать.
+    </div>
+}
+else
+{
+    <div>
+        <p>Найдено ресурсов: @resources.Count</p>
+
+        @foreach (var resource in resources)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">@resource.Name</h5>
+                    <p class="card-text">
+                        ID: @resource.Id<br />
+                        Тип: @resource.Type<br />
+                        Статус: @resource.Status<br />
+                        Поставщик: @resource.SupplierName<br />
+                        Местоположение: @resource.LocationDescription
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Restfull.Shared.DTOs.ResourceDto> resources = new();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadResources();
+    }
+
+    private async Task LoadResources()
+    {
+        isLoading = true;
+        resources = await ResourceService.GetResourcesAsync();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task SeedDatabase()
+    {
+        var success = await ResourceService.SeedDatabaseAsync();
+        if (success)
+        {
+            await LoadResources();
+        }
+    }
+
+    private void AddResource()
+    {
+        Navigation.NavigateTo("/resources/create");
+    }
+}

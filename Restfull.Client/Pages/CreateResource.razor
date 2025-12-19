@@ -1,0 +1,90 @@
+﻿@page "/resources/create"
+@page "/resources/edit/{id:int}"
+@using Restfull.Shared.DTOs
+@using Restfull.Client.Services
+@inject ResourceService ResourceService
+@inject NavigationManager Navigation
+
+<PageTitle>@title</PageTitle>
+
+<h3>@title</h3>
+
+<EditForm Model="@resource" OnValidSubmit="@HandleSubmit">
+    <div class="mb-3">
+        <label for="name" class="form-label">Название *</label>
+        <InputText id="name" class="form-control" @bind-Value="@resource.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Тип ресурса</label>
+        <select class="form-select" @bind="@resource.Type">
+            <option value="">Выберите тип</option>
+            <option value="software">Программное обеспечение</option>
+            <option value="equipment">Оборудование</option>
+            <option value="furniture">Мебель</option>
+            <option value="room">Комната</option>
+        </select>
+    </div>
+
+    @if (resource.Type == "software")
+    {
+        <div class="mb-3">
+            <label class="form-label">Версия</label>
+            <InputText class="form-control" @bind-Value="@resource.Version" />
+        </div>
+    }
+
+    <div class="mb-3">
+        <label class="form-label">Поставщик ID</label>
+        <InputNumber class="form-control" @bind-Value="@resource.SupplierId" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Местоположение ID</label>
+        <InputNumber class="form-control" @bind-Value="@resource.LocationId" />
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancel">Отмена</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private CreateResourceDto resource = new();
+    private string title = "Создание ресурса";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id > 0)
+        {
+            title = "Редактирование ресурса";
+            // Можно загрузить существующий ресурс для редактирования
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        bool success;
+        if (Id > 0)
+        {
+            success = await ResourceService.UpdateResourceAsync(Id, resource);
+        }
+        else
+        {
+            success = await ResourceService.CreateResourceAsync(resource);
+        }
+
+        if (success)
+        {
+            Navigation.NavigateTo("/resources");
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/resources");
+    }
+}

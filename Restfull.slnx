@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="Restfull.API/Restfull.API.csproj" />
+  <Project Path="Restfull.Client/Restfull.Client.csproj" />
   <Project Path="Restfull.Domain/Restfull.Domain.csproj" />
   <Project Path="Restfull.Infrastructure/Restfull.Infrastructure.csproj" />
+  <Project Path="Restfull.Shared/Restfull.Shared.csproj" />
 </Solution>
